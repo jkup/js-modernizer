@@ -1,8 +1,9 @@
 import estraverse from "estraverse";
-import * as acorn from "acorn";
+import { Node as AcornNode } from "acorn";
+import * as estree from "estree";
 
-export function transformVarToLetOrConst(ast: acorn.Node): void {
-  estraverse.replace(ast, {
+export function transformVarToLetOrConst(ast: AcornNode): void {
+  estraverse.replace(ast as estree.Node, {
     enter(node) {
       if (node.type === "VariableDeclaration" && node.kind === "var") {
         node.kind = "let"; // For simplicity, we use 'let' here
@@ -11,15 +12,14 @@ export function transformVarToLetOrConst(ast: acorn.Node): void {
   });
 }
 
-export function transformFunctionToArrowFunction(ast: acorn.Node): void {
-  estraverse.replace(ast, {
+export function transformFunctionToArrowFunction(ast: AcornNode): void {
+  estraverse.replace(ast as estree.Node, {
     enter(node) {
       if (node.type === "FunctionDeclaration") {
-        const arrowFunctionExpression = {
+        const arrowFunctionExpression: estree.ArrowFunctionExpression = {
           type: "ArrowFunctionExpression",
-          id: null,
           params: node.params,
-          body: node.body,
+          body: node.body as estree.BlockStatement,
           generator: node.generator,
           async: node.async,
           expression: false,
@@ -29,12 +29,12 @@ export function transformFunctionToArrowFunction(ast: acorn.Node): void {
           declarations: [
             {
               type: "VariableDeclarator",
-              id: node.id,
+              id: node.id as estree.Identifier,
               init: arrowFunctionExpression,
             },
           ],
           kind: "const",
-        };
+        } as estree.VariableDeclaration;
       }
     },
   });

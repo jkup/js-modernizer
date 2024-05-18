@@ -5,6 +5,7 @@ import {
   transformVarToLetOrConst,
   transformFunctionToArrowFunction,
 } from "./transform";
+import { Node as AcornNode } from "acorn";
 
 const inputFilePath = "input.js";
 const inputCode = fs.readFileSync(inputFilePath, "utf-8");
@@ -12,7 +13,7 @@ const inputCode = fs.readFileSync(inputFilePath, "utf-8");
 const ast = acorn.parse(inputCode, {
   ecmaVersion: "latest",
   sourceType: "module",
-}) as acorn.Node;
+}) as AcornNode;
 
 // Apply transformations
 transformVarToLetOrConst(ast);
