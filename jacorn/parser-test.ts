@@ -1,0 +1,87 @@
+import { Parser } from "./parser";
+import { Lexer } from "./lexer";
+import {
+  Program,
+  VariableDeclaration,
+  FunctionDeclaration,
+  ReturnStatement,
+  BinaryExpression,
+  Identifier,
+  Literal,
+} from "./ast";
+
+const inputCode = `
+var x = 1;
+var y = 2;
+function add(a, b) {
+  return a + b;
+}
+`;
+
+// Expected AST
+const expectedAST: Program = {
+  type: "Program",
+  body: [
+    {
+      type: "VariableDeclaration",
+      declarations: [
+        {
+          id: { type: "Identifier", name: "x" },
+          init: { type: "Literal", value: 1 },
+        },
+      ],
+    },
+    {
+      type: "VariableDeclaration",
+      declarations: [
+        {
+          id: { type: "Identifier", name: "y" },
+          init: { type: "Literal", value: 2 },
+        },
+      ],
+    },
+    {
+      type: "FunctionDeclaration",
+      id: { type: "Identifier", name: "add" },
+      params: [
+        { type: "Identifier", name: "a" },
+        { type: "Identifier", name: "b" },
+      ],
+      body: {
+        type: "BlockStatement",
+        body: [
+          {
+            type: "ReturnStatement",
+            argument: {
+              type: "BinaryExpression",
+              operator: "+",
+              left: { type: "Identifier", name: "a" },
+              right: { type: "Identifier", name: "b" },
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
+
+// Tokenize and parse the input code
+const lexer = new Lexer(inputCode);
+const tokens = lexer.tokenize();
+
+const parser = new Parser(tokens);
+const outputAST: Program = parser.parse();
+
+// Helper function to deeply compare two objects
+function deepEqual(obj1: any, obj2: any): boolean {
+  return JSON.stringify(obj1) === JSON.stringify(obj2);
+}
+
+// Test the parser output
+if (deepEqual(outputAST, expectedAST)) {
+  console.log("Test passed!");
+} else {
+  console.error("Test failed.");
+  console.error("Expected:", JSON.stringify(expectedAST, null, 2));
+  console.error("Got:", JSON.stringify(outputAST, null, 2));
+}

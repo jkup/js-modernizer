@@ -3,9 +3,14 @@ import {
   ASTNode,
   Program,
   VariableDeclaration,
-  VariableDeclarator,
+  FunctionDeclaration,
+  ReturnStatement,
+  BinaryExpression,
   Identifier,
   Literal,
+  BlockStatement,
+  Expression,
+  Statement,
 } from "./ast";
 
 export class Parser {
@@ -32,7 +37,7 @@ export class Parser {
     return this.advance();
   }
 
-  parse(): Program {
+  public parse(): Program {
     const program: Program = {
       type: "Program",
       body: [],
@@ -50,7 +55,14 @@ export class Parser {
     const token = this.peek();
     switch (token.type) {
       case TokenType.Keyword:
-        return this.parseVariableDeclaration();
+        if (token.value === "var") {
+          return this.parseVariableDeclaration();
+        } else if (token.value === "function") {
+          return this.parseFunctionDeclaration();
+        } else if (token.value === "return") {
+          return this.parseReturnStatement();
+        }
+        break;
       default:
         throw new Error(`Unexpected token type: ${token.type}`);
     }
@@ -66,6 +78,86 @@ export class Parser {
       type: "VariableDeclaration",
       declarations: [{ id, init }],
     };
+  }
+
+  private parseFunctionDeclaration(): FunctionDeclaration {
+    this.expect(TokenType.Keyword); // 'function'
+    const id = this.parseIdentifier();
+    this.expect(TokenType.Punctuation); // Expect '('
+    const params: Identifier[] = [];
+    while (
+      this.peek().type !== TokenType.Punctuation ||
+      this.peek().value !== ")"
+    ) {
+      params.push(this.parseIdentifier());
+      if (
+        this.peek().type === TokenType.Punctuation &&
+        this.peek().value === ","
+      ) {
+        this.advance();
+      }
+    }
+    this.expect(TokenType.Punctuation); // Expect ')'
+    const body = this.parseBlockStatement();
+    return {
+      type: "FunctionDeclaration",
+      id,
+      params,
+      body,
+    };
+  }
+
+  private parseBlockStatement(): BlockStatement {
+    this.expect(TokenType.Punctuation); // Expect '{'
+    const body: Statement[] = [];
+    while (
+      this.peek().type !== TokenType.Punctuation ||
+      this.peek().value !== "}"
+    ) {
+      body.push(this.parseStatement());
+    }
+    this.expect(TokenType.Punctuation); // Expect '}'
+    return {
+      type: "BlockStatement",
+      body,
+    };
+  }
+
+  private parseReturnStatement(): ReturnStatement {
+    this.expect(TokenType.Keyword); // 'return'
+    const argument = this.parseExpression();
+    this.expect(TokenType.Punctuation); // Expect ';'
+    return {
+      type: "ReturnStatement",
+      argument,
+    };
+  }
+
+  private parseExpression(): Expression {
+    const left = this.parsePrimaryExpression();
+    if (this.peek().type === TokenType.Operator) {
+      const operator = this.advance().value;
+      const right = this.parsePrimaryExpression();
+      return {
+        type: "BinaryExpression",
+        operator,
+        left,
+        right,
+      } as BinaryExpression;
+    }
+    return left;
+  }
+
+  private parsePrimaryExpression(): Expression {
+    const token = this.peek();
+    switch (token.type) {
+      case TokenType.Identifier:
+        return this.parseIdentifier();
+      case TokenType.Number:
+        return this.parseLiteral();
+      default:
+        throw new Error(`Unexpected token type: ${token.type}`);
+    }
   }
 
   private parseIdentifier(): Identifier {
