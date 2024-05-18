@@ -1,7 +1,10 @@
 const fs = require("fs");
 const acorn = require("acorn");
 const escodegen = require("escodegen");
-const { transformVarToLetOrConst } = require("./transform");
+const {
+  transformVarToLetOrConst,
+  transformFunctionToArrowFunction,
+} = require("./transform");
 
 const inputFilePath = "input.js";
 const inputCode = fs.readFileSync(inputFilePath, "utf-8");
@@ -13,6 +16,7 @@ const ast = acorn.parse(inputCode, {
 
 // Apply transformations
 transformVarToLetOrConst(ast);
+transformFunctionToArrowFunction(ast);
 
 // Generate the modernized code
 const modernizedCode = escodegen.generate(ast);
