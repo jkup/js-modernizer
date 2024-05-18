@@ -6,7 +6,7 @@ export function transformVarToLetOrConst(ast: AcornNode): void {
   estraverse.replace(ast as estree.Node, {
     enter(node) {
       if (node.type === "VariableDeclaration" && node.kind === "var") {
-        node.kind = "let"; // For simplicity, we use 'let' here
+        node.kind = "let";
       }
     },
   });
