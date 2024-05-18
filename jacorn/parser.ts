@@ -49,7 +49,7 @@ export class Parser {
   private parseStatement(): ASTNode {
     const token = this.peek();
     switch (token.type) {
-      case TokenType.Identifier:
+      case TokenType.Keyword:
         return this.parseVariableDeclaration();
       default:
         throw new Error(`Unexpected token type: ${token.type}`);
@@ -57,15 +57,14 @@ export class Parser {
   }
 
   private parseVariableDeclaration(): VariableDeclaration {
-    const declarations: VariableDeclarator[] = [];
+    this.expect(TokenType.Keyword); // 'var', 'let', 'const'
     const id = this.parseIdentifier();
     this.expect(TokenType.Operator); // Expect '='
     const init = this.parseLiteral();
-    declarations.push({ id, init });
-
+    this.expect(TokenType.Punctuation); // Expect ';'
     return {
       type: "VariableDeclaration",
-      declarations,
+      declarations: [{ id, init }],
     };
   }
 

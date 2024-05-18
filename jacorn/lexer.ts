@@ -41,6 +41,10 @@ export class Lexer {
     return { type, value, line: this.line, column: this.column };
   }
 
+  private isKeyword(word: string): boolean {
+    return ["var", "let", "const", "function", "return"].includes(word);
+  }
+
   public tokenize(): Token[] {
     const tokens: Token[] = [];
 
@@ -66,11 +70,28 @@ export class Lexer {
         while (this.isLetter(this.peek())) {
           value += this.advance();
         }
-        tokens.push(this.createToken(TokenType.Identifier, value));
+        if (this.isKeyword(value)) {
+          tokens.push(this.createToken(TokenType.Keyword, value));
+        } else {
+          tokens.push(this.createToken(TokenType.Identifier, value));
+        }
         continue;
       }
 
-      // Handle other cases: operators, punctuation, etc.
+      // Handle operators
+      if (char === "=") {
+        tokens.push(this.createToken(TokenType.Operator, this.advance()));
+        continue;
+      }
+
+      // Handle punctuation (for this example, we'll only handle semicolons)
+      if (char === ";") {
+        tokens.push(this.createToken(TokenType.Punctuation, this.advance()));
+        continue;
+      }
+
+      // Handle other cases: comments, strings, etc.
+      // ...
 
       this.advance();
     }
