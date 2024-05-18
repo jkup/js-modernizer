@@ -8,6 +8,7 @@ import {
   BinaryExpression,
   Identifier,
   Literal,
+  BlockStatement,
 } from "./ast";
 
 const inputCode = `
@@ -26,26 +27,26 @@ const expectedAST: Program = {
       type: "VariableDeclaration",
       declarations: [
         {
-          id: { type: "Identifier", name: "x" },
-          init: { type: "Literal", value: 1 },
+          id: { type: "Identifier", name: "x" } as Identifier,
+          init: { type: "Literal", value: 1 } as Literal,
         },
       ],
-    },
+    } as VariableDeclaration,
     {
       type: "VariableDeclaration",
       declarations: [
         {
-          id: { type: "Identifier", name: "y" },
-          init: { type: "Literal", value: 2 },
+          id: { type: "Identifier", name: "y" } as Identifier,
+          init: { type: "Literal", value: 2 } as Literal,
         },
       ],
-    },
+    } as VariableDeclaration,
     {
       type: "FunctionDeclaration",
-      id: { type: "Identifier", name: "add" },
+      id: { type: "Identifier", name: "add" } as Identifier,
       params: [
-        { type: "Identifier", name: "a" },
-        { type: "Identifier", name: "b" },
+        { type: "Identifier", name: "a" } as Identifier,
+        { type: "Identifier", name: "b" } as Identifier,
       ],
       body: {
         type: "BlockStatement",
@@ -55,13 +56,13 @@ const expectedAST: Program = {
             argument: {
               type: "BinaryExpression",
               operator: "+",
-              left: { type: "Identifier", name: "a" },
-              right: { type: "Identifier", name: "b" },
-            },
-          },
+              left: { type: "Identifier", name: "a" } as Identifier,
+              right: { type: "Identifier", name: "b" } as Identifier,
+            } as BinaryExpression,
+          } as ReturnStatement,
         ],
-      },
-    },
+      } as BlockStatement,
+    } as FunctionDeclaration,
   ],
 };
 

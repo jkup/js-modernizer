@@ -66,6 +66,7 @@ export class Parser {
       default:
         throw new Error(`Unexpected token type: ${token.type}`);
     }
+    throw new Error(`Unexpected token value: ${token.value}`);
   }
 
   private parseVariableDeclaration(): VariableDeclaration {
