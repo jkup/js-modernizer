@@ -1,11 +1,11 @@
 import fs from "fs";
-import acorn from "acorn";
+import acorn from "../jacorn/index";
 import escodegen from "escodegen";
 import {
   transformVarToLetOrConst,
   transformFunctionToArrowFunction,
 } from "./transform";
-import { Node as AcornNode } from "acorn";
+import { ASTNode } from "../jacorn/ast";
 
 const inputFilePath = "input.js";
 const inputCode = fs.readFileSync(inputFilePath, "utf-8");
@@ -13,7 +13,7 @@ const inputCode = fs.readFileSync(inputFilePath, "utf-8");
 const ast = acorn.parse(inputCode, {
   ecmaVersion: "latest",
   sourceType: "module",
-}) as AcornNode;
+}) as ASTNode;
 
 // Apply transformations
 transformVarToLetOrConst(ast);

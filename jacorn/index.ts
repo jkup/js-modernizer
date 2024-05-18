@@ -2,14 +2,22 @@ import { Lexer } from "./lexer";
 import { Parser } from "./parser";
 import { Program } from "./ast";
 
-const code = `
-    var x = 42;
-`;
+interface ParseOptions {
+  ecmaVersion?: string;
+  sourceType?: "script" | "module";
+}
 
-const lexer = new Lexer(code);
-const tokens = lexer.tokenize();
-console.log("Tokens:", tokens);
+function parse(code: string, options?: ParseOptions): Program {
+  // You can handle the options here if needed
+  const lexer = new Lexer(code);
+  const tokens = lexer.tokenize();
 
-const parser = new Parser(tokens);
-const ast: Program = parser.parse();
-console.log("AST:", JSON.stringify(ast, null, 2));
+  const parser = new Parser(tokens);
+  const ast: Program = parser.parse();
+
+  return ast;
+}
+
+export default {
+  parse,
+};

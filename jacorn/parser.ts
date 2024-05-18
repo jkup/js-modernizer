@@ -32,7 +32,7 @@ export class Parser {
     return this.advance();
   }
 
-  public parse(): Program {
+  parse(): Program {
     const program: Program = {
       type: "Program",
       body: [],

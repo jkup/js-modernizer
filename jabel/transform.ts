@@ -1,8 +1,9 @@
 import estraverse from "estraverse";
-import { Node as AcornNode } from "acorn";
+import { ASTNode } from "../jacorn/ast";
+
 import * as estree from "estree";
 
-export function transformVarToLetOrConst(ast: AcornNode): void {
+export function transformVarToLetOrConst(ast: ASTNode): void {
   estraverse.replace(ast as estree.Node, {
     enter(node) {
       if (node.type === "VariableDeclaration" && node.kind === "var") {
@@ -12,7 +13,7 @@ export function transformVarToLetOrConst(ast: AcornNode): void {
   });
 }
 
-export function transformFunctionToArrowFunction(ast: AcornNode): void {
+export function transformFunctionToArrowFunction(ast: ASTNode): void {
   estraverse.replace(ast as estree.Node, {
     enter(node) {
       if (node.type === "FunctionDeclaration") {
